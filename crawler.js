@@ -63,10 +63,10 @@ import { Parser } from 'json2csv';
   }
 
  
-  const parser = new Parser();
-  const json = parser.parse(results);
+  // const parser = new Parser();
+  // const json = parser.parse(results);
   const filePath = 'corruption_articles.json';
-  fs.writeFileSync(filePath, json, 'utf8');
+  fs.writeFileSync(filePath, JSON.stringify(results, null, 2));
   console.log(`JSON file saved as ${filePath}`);
 
 
