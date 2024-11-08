@@ -42,7 +42,7 @@ import { Parser } from 'json2csv';
 
          
           const articleText = await page.evaluate(() => {
-            return document.body.innerText.trim();
+            return document.body;
           });
 
          

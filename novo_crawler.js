@@ -12,7 +12,7 @@ import { Readability } from '@mozilla/readability';
   await page.goto('https://www.guiademidia.com.br/jornaisdesantacatarina.htm');
 
   const newspapers = await page.evaluate(() => {
-    const newspaperElements = Array.from(document.querySelectorAll('a')); // Select all links that start with http (why not https?)
+    const newspaperElements = Array.from(document.querySelectorAll('a')); 
     return newspaperElements.map(element => ({
       name: element.textContent.trim(),
       url: element.href
@@ -26,8 +26,8 @@ import { Readability } from '@mozilla/readability';
   for (const newspaper of newspapers) {
     try {
       console.log(`Checking newspaper: ${newspaper.name}`);
-      await page.goto(newspaper.url);
-      
+      await page.goto(newspaper.url, { waitUntil: 'networkidle' });
+      await page.waitForTimeout(3000);
       const keywords = ['corrupcao', 'fraude', 'conluio', 'suborno', 'desvio']
     
       const articles = await page.evaluate((keywords) => {
@@ -47,21 +47,20 @@ import { Readability } from '@mozilla/readability';
           }
 
           console.log(`Fetching article: ${article.title}`);
-          await page.goto(article.url);
+          await page.goto(article.url, { waitUntil: 'domcontentloaded' });
+          await page.waitForTimeout(3000); 
 
           const html = await page.content();
-
           const dom = new JSDOM(html);
           const reader = new Readability(dom.window.document);
           const articleData = reader.parse();
-
-          const articleText = articleData ? articleData.textContent.trim() : '';
          
           results.push({
             newspaper: newspaper.name,
             title: article.title,
             url: article.url,
-            text: articleText
+            date: articleData.publishedTime,
+            text: articleData
           });
 
           processedUrls.add(article.url);
@@ -75,13 +74,9 @@ import { Readability } from '@mozilla/readability';
     }
   }
 
- 
-  // const parser = new Parser();
-  // const json = parser.parse(results);
   const filePath = 'corruption_articles.json';
   fs.writeFileSync(filePath, JSON.stringify(results, null, 2));
   console.log(`JSON file saved as ${filePath}`);
-
 
   await browser.close();
 })();
