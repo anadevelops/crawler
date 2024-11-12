@@ -86,17 +86,29 @@ import nlp from 'compromise';
             return document.querySelector('.date, .published-date, .published, .post-date, .data-post, .data, .td-post-date, .jeg_meta_date')?.innerText;
           });
 
-          const auxCities = nlp(articleText);
-          const cities = auxCities.places().out('array');
-          const foundSCCities = cities.filter(city => scCities.includes(city));
+          const content = await page.evaluate(() => {
+            return document.documentElement.innerText;
+          });
+
+          const aux = nlp(content);
+          const cities = aux.places().out('array');
+          console.log(`Cidades: ${cities}`);
+
+          const foundSCCities = cities.filter(city => scCities.some(c => c.toLowerCase().trim() === city.toLowerCase().trim()));
+          console.log(`Cidades encontradas: ${foundSCCities}`)
+
+          const people = aux.people().out('array');
+          const organizations = aux.organizations().out('array');
 
           results.push({
             newspaper: newspaper.name,
             title: article.title,
             url: article.url,
-            text: articleText,
+            // text: articleText,
             date: articleDate,
-            cities: foundSCCities
+            cities: foundSCCities,
+            people: people,
+            organizations: organizations
           });
 
           processedUrls.add(article.url);
