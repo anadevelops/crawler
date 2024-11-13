@@ -17,6 +17,7 @@
     "jsdom": "^25.0.1",
     "json2csv": "^6.0.0-alpha.2",
     "playwright": "^1.48.2",
-    "pt-compromise": "^0.0.3"
+    "pt-compromise": "^0.0.3",
+    "python": "^0.0.4"
   }
 }

@@ -63,11 +63,14 @@ import { Readability } from '@mozilla/readability';
     
       const articles = await page.evaluate((keywords) => {
         const links = Array.from(document.querySelectorAll('a'));
-        return links.filter(link => keywords.some(keyword => link.textContent.toLowerCase().includes(keyword.toLowerCase()))
-          ).map(link => ({
+        return links.flatMap(link => {
+          const foundKeywords = keywords.filter(keyword => link.textContent.toLowerCase().includes(keyword.toLowerCase()));
+          return foundKeywords.length > 0 ? {
             title: link.textContent.trim(),
-            url: link.href
-          }))
+            url: link.href,
+            keywords: foundKeywords
+          }: [];
+        });
       }, keywords);
 
       for (const article of articles) {
@@ -85,7 +88,7 @@ import { Readability } from '@mozilla/readability';
           });
 
           const articleDate = await page.evaluate(() => {
-            return document.querySelector('.date, .published-date, .published, .post-date, .data-post, .data, .td-post-date, .jeg_meta_date')?.innerText;
+            return document.querySelector('.date, .published-date, .published, .post-date, .data-post, .data, .td-post-date, .jeg_meta_date, .post__data__published, .meta-date, .datas_interno, .entry-date')?.innerText;
           });
 
           const cleanHtml = await page.evaluate(() => {
@@ -97,29 +100,43 @@ import { Readability } from '@mozilla/readability';
           const dom = new JSDOM(cleanHtml);
           const reader = new Readability(dom.window.document);
           const articleData = reader.parse()
-
-          const aux = nlp(articleData.textContent);
           
           const foundSCCities = scCities.filter(city => {
             const regex = new RegExp(`\\b${city}\\b`, 'i');
             return regex.test(articleText);
           });
 
-          const people = aux.people().out('array');
-          console.log(`Pessoas: ${people}`);
+          const regx = /(?:R\$|\$)\s*\d{1,3}(?:\.\d{3})*(?:,\d{2})?(?:\s*(mil|milhões|bilhões))?/gi;
+          const monetary_value = articleText.match(regx);
+          console.log(`VALOR = ${monetary_value}`)
 
-          const organizations = aux.organizations().out('array');
-          console.log(`Organizações: ${organizations}`);
+          const reg = /promotor\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
+          const prosecutor = articleText.match(reg);
+
+          const response = await fetch('http://localhost:5000/extract_entities', {
+            method: 'POST',
+            headers: {
+              'Content-type': 'application/json'
+            },
+            body: JSON.stringify({text: articleData.textContent})
+          });
+
+          const entities = await response.json();
+          const people = entities.people;
+          const organizations = entities.organizations;
 
           results.push({
             newspaper: newspaper.name,
             title: article.title,
             url: article.url,
             // text: articleText,
-            date: articleDate,
+            date: articleDate || null, 
             cities: foundSCCities,
-            people: people,
-            organizations: organizations
+            people: people, 
+            organizations: organizations,
+            fraud: article.keywords,
+            value: monetary_value || null,
+            prosecutor: prosecutor || null
           });
 
           processedUrls.add(article.url);
