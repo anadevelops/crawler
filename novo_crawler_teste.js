@@ -1,6 +1,8 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
 import nlp from 'compromise';
+import { JSDOM } from 'jsdom';
+import { Readability } from '@mozilla/readability';
 
 (async () => {
 
@@ -86,9 +88,17 @@ import nlp from 'compromise';
             return document.querySelector('.date, .published-date, .published, .post-date, .data-post, .data, .td-post-date, .jeg_meta_date')?.innerText;
           });
 
-          const aux = nlp(articleText);
-          // const cities = aux.places().out('array');
-          // console.log(`Cidades: ${cities}`);
+          const cleanHtml = await page.evaluate(() => {
+            const scripts = document.querySelectorAll('script, style');
+            scripts.forEach(script => script.remove());
+            return document.documentElement.outerHTML;
+          });
+
+          const dom = new JSDOM(cleanHtml);
+          const reader = new Readability(dom.window.document);
+          const articleData = reader.parse()
+
+          const aux = nlp(articleData.textContent);
           
           const foundSCCities = scCities.filter(city => {
             const regex = new RegExp(`\\b${city}\\b`, 'i');
@@ -96,10 +106,10 @@ import nlp from 'compromise';
           });
 
           const people = aux.people().out('array');
-          console.log(`Pessoas: ${people}`)
+          console.log(`Pessoas: ${people}`);
 
           const organizations = aux.organizations().out('array');
-          console.log(`Organizações: ${organizations}`)
+          console.log(`Organizações: ${organizations}`);
 
           results.push({
             newspaper: newspaper.name,
