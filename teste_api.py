@@ -13,14 +13,20 @@
 # else:
 #     print(f"Failed to get a response: {response.status_code}")
 
-import spacy
+# import spacy
 
-nlp = spacy.load('pt_core_news_lg')
+# nlp = spacy.load('pt_core_news_lg')
 
-text = 'O João e a Maria foram á empresa XYZ e gastaram R$ 100,00.'
-doc = nlp(text)
+# text = 'O João e a Maria foram á empresa XYZ e gastaram R$ 100,00.'
+# doc = nlp(text)
 
-print(doc.ents)
+# print(doc.ents)
 
-for ent in doc.ents:
-    print(ent.text, ent.label_)
+# for ent in doc.ents:
+#     print(ent.text, ent.label_)
+
+
+import sys,os
+
+sys.path.insert(0,os.path.abspath(os.curdir))
+print(sys.path)
