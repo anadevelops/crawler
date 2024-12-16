@@ -13,7 +13,7 @@ const loadProcessedUrls = (filePath) => {
   return new Set();
 };
 
-const saveProcessedrls = (filePath, processedUrls) => {
+const saveProcessedUrls = (filePath, processedUrls) => {
   fs.writeFileSync(filePath, JSON.stringify(Array.from(processedUrls), null, 2));
 };
 
@@ -35,7 +35,7 @@ const runCrawler = (async () => {
   const results = [];
   const processedUrlsFilePath = 'processed_urls.json'
   const processedUrls = loadProcessedUrls(processedUrlsFilePath);
-  const keywords = [ "corrupção", "fraude", "conluio", "suborno", "propina", "desvio de verba", "malversação", "lavagem de dinheiro", "peculato", "tráfico de influência", "enriquecimento ilícito", "abuso de poder", "improbidade administrativa", "extorsão", "cartel", "superfaturamento", "sonegação fiscal", "evasão de divisas", "auditoria", "operação policial", "investigação", "delação premiada", "denúncia anônima", "mandado de busca", "inquérito", "cooperação internacional", "delator", "tribunal de contas", "controladoria", "fiscalização", "acordo de leniência", "impunidade", "deliberação", "crime financeiro", "processo judicial", "ministério público", "mandado de prisão", "investigação federal", "justiça federal", "tribunal superior", "recurso", "servidor público", "funcionário público", "político envolvido", "setor público", "ONGs envolvidas", "compliance", "integridade corporativa", "manipulação de mercado", "fraude contábil", "evasão de impostos", "conflito de interesses", "orçamento público", "fundos desviados", "arrecadação", "caixa dois", "fraude fiscal", "paraísos fiscais", "contratos superfaturados", "contratos públicos", "licitações fraudulentas", "aditivos contratuais", "contas bloqueadas", "contas offshore", "fundos ilícitos", "patrimônio não declarado", "bens confiscados" ];
+  const keywords = ["corrupção", "fraude", "conluio", "suborno", "propina", "desvio de verba", "malversação", "lavagem de dinheiro", "peculato", "tráfico de influência", "enriquecimento ilícito", "abuso de poder", "improbidade administrativa", "extorsão", "cartel", "superfaturamento", "sonegação fiscal", "evasão de divisas", "auditoria", "delação premiada", "denúncia anônima", "mandado de busca", "inquérito", "cooperação internacional", "delator", "tribunal de contas", "controladoria", "acordo de leniência", "impunidade", "deliberação", "crime financeiro", "processo judicial", "mandado de prisão", "investigação federal", "justiça federal", "tribunal superior", "recurso", "servidor público", "funcionário público", "político envolvido", "setor público", "ONGs envolvidas", "compliance", "integridade corporativa", "manipulação de mercado", "fraude contábil", "evasão de impostos", "conflito de interesses", "orçamento público", "fundos desviados", "arrecadação", "caixa dois", "fraude fiscal", "paraísos fiscais", "contratos superfaturados", "contratos públicos", "licitações fraudulentas", "aditivos contratuais", "contas bloqueadas", "contas offshore", "fundos ilícitos", "patrimônio não declarado", "bens confiscados"];
   const scCities = ['Abdon Batista', 'Abelardo Luz', 'Agrolândia', 'Agronômica', 'Água Doce', 'Águas de Chapecó', 'Águas Frias',
                     'Águas Mornas', 'Alfredo Wagner', 'Alto Bela Vista', 'Anchieta', 'Angelina', 'Anita Garibaldi', 'Anitápolis',
                     'Antônio Carlos', 'Apiúna', 'Arabutã', 'Araquari', 'Araranguá', 'Armazém', 'Arroio Trinta', 'Arvoredo',
@@ -68,119 +68,120 @@ const runCrawler = (async () => {
                     'Tijucas', 'Timbó', 'Timbó Grande', 'Três Barras', 'Treviso', 'Treze de Maio', 'Treze Tílias',  'Trombudo Central', 'Tubarão', 'Tunápolis', 'Turvo', 'União do Oeste', 'Urubici',
                     'Urupema', 'Urussanga', 'Vargeão', 'Vargem', 'Vargem Bonita', 'Vidal Ramos', 'Videira', 'Vitor Meireles', 'Witmarsum', 'Xanxerê', 'Xavantina', 'Xaxim', 'Zortéa'];
 
-  while (true) {
-    for (const newspaper of newspapers) {
-      const page = await browser.newPage();
-      try {
-        console.log(`Checking newspaper: ${newspaper.name}`);
-        await page.goto(newspaper.url, { waitUntil: 'domcontentloaded', timeout: 15000 });
-        await page.waitForTimeout(5000);
+  for (const newspaper of newspapers) {
+    const page = await browser.newPage();
+    try {
+      console.log(`Checking newspaper: ${newspaper.name}`);
+      await page.goto(newspaper.url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+      await page.waitForTimeout(5000);
       
-        const articles = await page.evaluate((keywords) => {
-          const links = Array.from(document.querySelectorAll('a'));
-          return links.flatMap(link => {
-            const foundKeywords = keywords.filter(keyword => link.textContent.toLowerCase().includes(keyword.toLowerCase()));
-            return foundKeywords.length > 0 ? {
-              title: link.textContent.trim(),
-              url: link.href,
-              keywords: foundKeywords
-            }: [];
-          });
-        }, keywords);
+      const articles = await page.evaluate((keywords) => {
+        const links = Array.from(document.querySelectorAll('a'));
+        return links.flatMap(link => {
+          const foundKeywords = keywords.filter(keyword => link.textContent.toLowerCase().includes(keyword.toLowerCase()));
+          return foundKeywords.length > 0 ? {
+            title: link.textContent.trim(),
+            url: link.href,
+            keywords: foundKeywords
+          }: [];
+        });
+      }, keywords);
 
-        for (const article of articles) {
-          try {
-            if (processedUrls.has(article.url)) {
-              continue;
-            }
-
-            console.log(`Fetching article: ${article.title}`);
-            await page.goto(article.url, { waitUntil: 'domcontentloaded', timeout: 15000 });
-            await page.waitForTimeout(5000);
-
-            const articleText = await page.evaluate(() => {
-              return document.documentElement.outerHTML;
-            });
-
-            const articleDate = await page.evaluate(() => {
-              return document.querySelector('.date, .published-date, .published, .post-date, .data-post, .data, .td-post-date, .jeg_meta_date, .post__data__published, .meta-date, .datas_interno, .entry-date')?.innerText;
-            });
-
-            const cleanHtml = await page.evaluate(() => {
-              const scripts = document.querySelectorAll('script, style');
-              scripts.forEach(script => script.remove());
-              return document.documentElement.outerHTML;
-            });
-
-            const dom = new JSDOM(cleanHtml);
-            const reader = new Readability(dom.window.document);
-            const articleData = reader.parse()
-
-            const hash = crypto.createHash('sha256').update(articleData.textContent).digest('hex');
-            
-            processedUrls.add(article.url);
-
-            const foundSCCities = scCities.filter(city => {
-              const regex = new RegExp(`\\b${city}\\b`, 'i');
-              return regex.test(articleText);
-            });
-
-            const regx = /(?:R\$|\$)\s*\d{1,3}(?:\.\d{3})*(?:,\d{2})?(?:\s*(mil|milhões|bilhões))?/gi;
-            const monetary_value = articleText.match(regx);
-
-            const reg = /promotor\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
-            const prosecutor = articleText.match(reg);
-
-            const response = await fetch('http://localhost:5000/extract_entities', {
-              method: 'POST',
-              headers: {
-                'Content-type': 'application/json'
-              },
-              body: JSON.stringify({text: articleData.textContent})
-            });
-
-            const entities = await response.json();
-            let people = entities.people;
-            const organizations = entities.organizations;
-
-            people = people.filter(person => !scCities.includes(person));
-
-            results.push({
-              newspaper: newspaper.name,
-              title: article.title,
-              url: article.url,
-              text: articleText,
-              date: articleDate || null, 
-              cities: foundSCCities,
-              people: people, 
-              organizations: organizations,
-              fraud: article.keywords,
-              value: monetary_value || null,
-              prosecutor: prosecutor || null
-            });
-
-            processedUrls.add(article.url);
-
-          } catch (err) {
-            console.error(`Failed to fetch article: ${article.title} - ${err}`);
-            break;
+      for (const article of articles) {
+        try {
+          if (processedUrls.has(article.url)) {
+            continue;
           }
+
+          console.log(`Fetching article: ${article.title}`);
+          await page.goto(article.url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+          await page.waitForTimeout(5000);
+
+          const articleText = await page.evaluate(() => {
+            return document.documentElement.outerHTML;
+          });
+
+          const articleDate = await page.evaluate(() => {
+            return document.querySelector('.date, .published-date, .published, .post-date, .data-post, .data, .td-post-date, .jeg_meta_date, .post__data__published, .meta-date, .datas_interno, .entry-date')?.innerText;
+          });
+
+          const cleanHtml = await page.evaluate(() => {
+            const scripts = document.querySelectorAll('script, style');
+            scripts.forEach(script => script.remove());
+            return document.documentElement.outerHTML;
+          });
+
+          const dom = new JSDOM(cleanHtml);
+          const reader = new Readability(dom.window.document);
+          const articleData = reader.parse()
+
+          const hash = crypto.createHash('sha256').update(articleData.textContent).digest('hex');
+            
+          processedUrls.add(article.url);
+
+          const foundSCCities = scCities.filter(city => {
+            const regex = new RegExp(`\\b${city}\\b`, 'i');
+            return regex.test(articleData);
+          });
+
+          
+          
+
+          const regx = /(?:R\$|\$)\s*\d{1,3}(?:\.\d{3})*(?:,\d{2})?(?:\s*(mil|milhões|bilhões|reais|dólares))?/gi;
+          const monetary_value = articleData.textContent.match(regx);
+
+          const reg = /promotor\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
+          const prosecutor = articleData.textContent.match(reg);
+
+          const response = await fetch('http://localhost:5000/extract_entities', {
+            method: 'POST',
+            headers: {
+              'Content-type': 'application/json'
+            },
+            body: JSON.stringify({text: articleData.textContent})
+          });
+
+          const entities = await response.json();
+          let people = entities.people;
+          const organizations = entities.organizations;
+
+          people = people.filter(person => !scCities.includes(person));
+
+          results.push({
+            newspaper: newspaper.name,
+            title: article.title,
+            url: article.url,
+            // text: articleText,
+            date: articleDate || null, 
+            cities: foundSCCities,
+            people: people, 
+            organizations: organizations,
+            fraud: article.keywords,
+            value: monetary_value || null,
+            prosecutor: prosecutor || null
+          });
+
+
+          processedUrls.add(article.url);
+
+        } catch (err) {
+          console.error(`Failed to fetch article: ${article.title} - ${err}`);
+          break;
         }
-      } catch (err) {
-        console.error(`Failed to check newspaper: ${newspaper.name} - ${err}`);
-      } finally {
-        await page.close();
       }
+    } catch (err) {
+      console.error(`Failed to check newspaper: ${newspaper.name} - ${err}`);
+    } finally {
+      await page.close();
     }
+  }
 
-    saveProcessedrls(processedUrlsFilePath, processedUrls);
+  saveProcessedUrls(processedUrlsFilePath, processedUrls);
 
-    const filePath = 'corruption_articles.json';
-    fs.writeFileSync(filePath, JSON.stringify(results, null, 2));
-    console.log('JSON file updated');
-
-    await new Promise(resolve => setTimeout(resolve, 60000));
-  };
+  const filePath = 'corruption_articles.json';
+  fs.writeFileSync(filePath, JSON.stringify(results, null, 2));
+  console.log('Results:', results);
+  console.log('JSON file updated');
 
   await mainPage.close();
   await browser.close();

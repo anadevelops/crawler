@@ -1,0 +1,4 @@
+# Arquivos e pastas a serem ignorados
+node_modules/
+npm-debug.log
+teste_api.py
