@@ -35,7 +35,7 @@ const runCrawler = (async () => {
   const results = [];
   const processedUrlsFilePath = 'processed_urls.json'
   const processedUrls = loadProcessedUrls(processedUrlsFilePath);
-  const keywords = ["corrupção", "fraude", "conluio", "suborno", "propina", "desvio de verba", "malversação", "lavagem de dinheiro", "peculato", "tráfico de influência", "enriquecimento ilícito", "abuso de poder", "improbidade administrativa", "extorsão", "cartel", "superfaturamento", "sonegação fiscal", "evasão de divisas", "auditoria", "delação premiada", "denúncia anônima", "mandado de busca", "inquérito", "cooperação internacional", "delator", "tribunal de contas", "controladoria", "acordo de leniência", "impunidade", "deliberação", "crime financeiro", "processo judicial", "mandado de prisão", "investigação federal", "justiça federal", "tribunal superior", "recurso", "servidor público", "funcionário público", "político envolvido", "setor público", "ONGs envolvidas", "compliance", "integridade corporativa", "manipulação de mercado", "fraude contábil", "evasão de impostos", "conflito de interesses", "orçamento público", "fundos desviados", "arrecadação", "caixa dois", "fraude fiscal", "paraísos fiscais", "contratos superfaturados", "contratos públicos", "licitações fraudulentas", "aditivos contratuais", "contas bloqueadas", "contas offshore", "fundos ilícitos", "patrimônio não declarado", "bens confiscados"];
+  const keywords = ["corrupção", "fraude", "conluio", "suborno", "propina", "desvio de verba", "malversação", "lavagem de dinheiro", "peculato", "tráfico de influência", "enriquecimento ilícito", "abuso de poder", "improbidade administrativa", "extorsão", "cartel", "superfaturamento", "sonegação fiscal", "evasão de divisas", "auditoria", "delação premiada", "denúncia anônima", "mandado de busca", "inquérito", "cooperação internacional", "delator", "tribunal de contas", "controladoria", "acordo de leniência", "impunidade", "deliberação", "crime financeiro", "processo judicial", "mandado de prisão", "investigação federal", "justiça federal", "tribunal superior", "político envolvido", "setor público", "ONGs envolvidas", "compliance", "integridade corporativa", "manipulação de mercado", "fraude contábil", "evasão de impostos", "conflito de interesses", "fundos desviados", "caixa dois", "fraude fiscal", "paraísos fiscais", "contratos superfaturados", "contratos públicos", "licitações fraudulentas", "aditivos contratuais", "contas bloqueadas", "contas offshore", "fundos ilícitos", "patrimônio não declarado", "bens confiscados"];
   const scCities = ['Abdon Batista', 'Abelardo Luz', 'Agrolândia', 'Agronômica', 'Água Doce', 'Águas de Chapecó', 'Águas Frias',
                     'Águas Mornas', 'Alfredo Wagner', 'Alto Bela Vista', 'Anchieta', 'Angelina', 'Anita Garibaldi', 'Anitápolis',
                     'Antônio Carlos', 'Apiúna', 'Arabutã', 'Araquari', 'Araranguá', 'Armazém', 'Arroio Trinta', 'Arvoredo',
@@ -121,11 +121,13 @@ const runCrawler = (async () => {
 
           const foundSCCities = scCities.filter(city => {
             const regex = new RegExp(`\\b${city}\\b`, 'i');
-            return regex.test(articleData);
+            return regex.test(articleData) || regex.test(article.title);
           });
 
-          
-          
+          if (foundSCCities === 0) {
+            console.log('No SC city found.');
+            continue;
+          };
 
           const regx = /(?:R\$|\$)\s*\d{1,3}(?:\.\d{3})*(?:,\d{2})?(?:\s*(mil|milhões|bilhões|reais|dólares))?/gi;
           const monetary_value = articleData.textContent.match(regx);
@@ -143,9 +145,10 @@ const runCrawler = (async () => {
 
           const entities = await response.json();
           let people = entities.people;
-          const organizations = entities.organizations;
+          let organizations = entities.organizations;
 
           people = people.filter(person => !scCities.includes(person));
+          organizations = organizations.filter(organization => !scCities.includes(organization));
 
           results.push({
             newspaper: newspaper.name,
