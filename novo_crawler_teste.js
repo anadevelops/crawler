@@ -4,6 +4,7 @@ import nlp from 'compromise';
 import { JSDOM } from 'jsdom';
 import { Readability } from '@mozilla/readability';
 import crypto from 'crypto';
+import axios from 'axios';
 
 const loadProcessedUrls = (filePath) => {
   if (fs.existsSync(filePath)) {
@@ -35,7 +36,7 @@ const runCrawler = (async () => {
   const results = [];
   const processedUrlsFilePath = 'processed_urls.json'
   const processedUrls = loadProcessedUrls(processedUrlsFilePath);
-  const keywords = ["corrupção", "fraude", "conluio", "suborno", "propina", "desvio de verba", "malversação", "lavagem de dinheiro", "peculato", "tráfico de influência", "enriquecimento ilícito", "abuso de poder", "improbidade administrativa", "extorsão", "cartel", "superfaturamento", "sonegação fiscal", "evasão de divisas", "auditoria", "delação premiada", "denúncia anônima", "mandado de busca", "inquérito", "cooperação internacional", "delator", "tribunal de contas", "controladoria", "acordo de leniência", "impunidade", "deliberação", "crime financeiro", "processo judicial", "mandado de prisão", "investigação federal", "justiça federal", "tribunal superior", "político envolvido", "setor público", "ONGs envolvidas", "compliance", "integridade corporativa", "manipulação de mercado", "fraude contábil", "evasão de impostos", "conflito de interesses", "fundos desviados", "caixa dois", "fraude fiscal", "paraísos fiscais", "contratos superfaturados", "contratos públicos", "licitações fraudulentas", "aditivos contratuais", "contas bloqueadas", "contas offshore", "fundos ilícitos", "patrimônio não declarado", "bens confiscados"];
+  const keywords = ["corrupção", "fraude", "conluio", "suborno", "propina", "desvio de verba", "malversação", "lavagem de dinheiro", "peculato", "tráfico de influência", "enriquecimento ilícito", "abuso de poder", "improbidade administrativa", "cartel", "superfaturamento", "sonegação fiscal", "evasão de divisas", "delação premiada", "denúncia anônima", "mandado de busca", "inquérito", "cooperação internacional", "delator", "tribunal de contas", "controladoria", "acordo de leniência", "impunidade", "deliberação", "crime financeiro", "processo judicial", "mandado de prisão", "investigação federal", "justiça federal", "tribunal superior", "político envolvido", "setor público", "ONGs envolvidas", "compliance", "integridade corporativa", "manipulação de mercado", "fraude contábil", "evasão de impostos", "conflito de interesses", "fundos desviados", "caixa dois", "fraude fiscal", "paraísos fiscais", "contratos superfaturados", "contratos públicos", "licitações fraudulentas", "aditivos contratuais", "contas bloqueadas", "contas offshore", "fundos ilícitos", "patrimônio não declarado", "bens confiscados"];
   const scCities = ['Abdon Batista', 'Abelardo Luz', 'Agrolândia', 'Agronômica', 'Água Doce', 'Águas de Chapecó', 'Águas Frias',
                     'Águas Mornas', 'Alfredo Wagner', 'Alto Bela Vista', 'Anchieta', 'Angelina', 'Anita Garibaldi', 'Anitápolis',
                     'Antônio Carlos', 'Apiúna', 'Arabutã', 'Araquari', 'Araranguá', 'Armazém', 'Arroio Trinta', 'Arvoredo',
@@ -127,6 +128,8 @@ const runCrawler = (async () => {
           if (foundSCCities === 0) {
             console.log('No SC city found.');
             continue;
+          } else {
+            console.log('Cidades: ', foundSCCities)
           };
 
           const regx = /(?:R\$|\$)\s*\d{1,3}(?:\.\d{3})*(?:,\d{2})?(?:\s*(mil|milhões|bilhões|reais|dólares))?/gi;
@@ -164,7 +167,6 @@ const runCrawler = (async () => {
             prosecutor: prosecutor || null
           });
 
-
           processedUrls.add(article.url);
 
         } catch (err) {
@@ -179,12 +181,22 @@ const runCrawler = (async () => {
     }
   }
 
+  const sendResultsToApp = async (results) => {
+    try {
+      await axios.post('http://localhost:5000/add_results', results);
+      console.log('Resultados enviados para o Flask com sucesso.');
+    } catch (err) {
+      console.error('Erro ao enviar results: ', err);
+    }
+  };
+
   saveProcessedUrls(processedUrlsFilePath, processedUrls);
 
   const filePath = 'corruption_articles.json';
   fs.writeFileSync(filePath, JSON.stringify(results, null, 2));
-  console.log('Results:', results);
+  await sendResultsToApp(results);
   console.log('JSON file updated');
+
 
   await mainPage.close();
   await browser.close();

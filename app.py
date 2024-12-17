@@ -1,9 +1,12 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import spacy
 from spacy.training import Example
 from spacy.pipeline import EntityRecognizer
+import json
 
 app = Flask(__name__)
+CORS(app)
 
 nlp = spacy.load("pt_core_news_lg")
 
@@ -39,6 +42,8 @@ def train_model(nlp, train_data, epochs=10):
 train_model(nlp, TRAIN_DATA)
 nlp.to_disk("trained_model")
 
+results = []
+
 @app.route("/extract_entities", methods=["POST"])
 def extract_entities():
     data = request.get_json()
@@ -50,5 +55,21 @@ def extract_entities():
 
     return jsonify({"people": people, "organizations": organizations})
 
+@app.route('/add_results', methods=['POST'])
+def add_results():
+    global results
+    data = request.get_json()
+    results.extend(data)
+    return jsonify({'message': 'Resultados adicionados com sucesso!'})
+
+@app.route('/results', methods = ['GET'])
+def get_results():
+    try:
+        with open('corruption_articles.json', 'r', encoding='utf-8') as file:
+            results = json.load(file)
+            return jsonify(results)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        return jsonify({'error': f'Erro ao ler o arquivo: {e}'})
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
