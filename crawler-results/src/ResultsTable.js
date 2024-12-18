@@ -3,12 +3,13 @@ import Table from 'react-bootstrap/Table';
 
 function ResultsTable({ results }) {
   return (
-    <Table striped bordered  variant='dark'>
+    <Table striped bordered hover>
       <thead>
         <tr>
           <th>Jornal</th>
           <th>Título</th>
           <th>URL</th>
+          <th>Data</th>
           <th>Cidades</th>
           <th>Pessoas</th>
           <th>Organizações</th>
@@ -22,6 +23,7 @@ function ResultsTable({ results }) {
             <td>{result.newspaper}</td>
             <td>{result.title}</td>
             <td><a href={result.url} target="_blank" rel="noopener noreferrer">Link</a></td>
+            <td>{result.date}</td>
             <td>{result.cities.join(', ')}</td>
             <td>{result.people.join(', ')}</td>
             <td>{result.organizations.join(', ')}</td>

@@ -1,53 +1,26 @@
 [
   {
-    "newspaper": "ND Mais",
-    "title": "Auditoria nacional reconhece o serviço de 12 cartórios de SC entre os melhores do país",
-    "url": "https://ndmais.com.br/cidadania/auditoria-nacional-reconhece-o-servico-de-12-cartorios-de-sc-entre-os-melhores-do-pais/",
-    "date": "17/12/2024 ÀS 10H09",
-    "cities": [],
-    "people": [
-      "Rogerio Bacellar",
-      "Anoreg BR",
-      "Otávio Margarida",
-      "ProtestoBalneário Camboriú2º Ofício de Registro de ImóveisCriciúma1°"
+    "newspaper": "Jornal do Comércio",
+    "title": "Operação Tangente: grupo é investigado por corrupção em Navegantes",
+    "url": "https://jornaljc.com.br/seguranca/2024/operacao-tangente-grupo-e-investigado-por-corrupcao-em-navegantes/",
+    "date": "18 DE DEZEMBRO DE 2024",
+    "cities": [
+      "Navegantes"
     ],
+    "people": [],
     "organizations": [
-      "CNJ",
-      "Conselho Nacional de Justiça",
-      "PQTA",
-      "Associação dos Notários e Registradores do Brasil",
-      "APCER Brasil",
-      "Associação Portuguesa de Certificação",
-      "CNJ",
-      "Conselho Nacional de Justiça).“Há",
-      "Selo Digital Fiscalizador",
-      "CNJ",
-      "SCJoinvilleRegistro de ImóveisBarra VelhaOfício de Registro de ImóveisSão JoséTabelionato de Notas"
-    ],
-    "fraud": [
-      "auditoria"
-    ],
-    "value": null,
-    "prosecutor": null
-  },
-  {
-    "newspaper": "Diário do Sul",
-    "title": "PEDRO HERMÍNIO\n\t\t\t\t\t\t\t\t\t\t\tOs males da corrupção",
-    "url": "https://diariodosul.com.br/colunistas/pedro-herminio/os-males-da-corrupcao-36010",
-    "date": null,
-    "cities": [],
-    "people": [
-      "Gaecos",
-      "Pitágoras",
-      "Ltda",
-      "Machado de Assis"
-    ],
-    "organizations": [
-      "Dia Internacional de Combate à Corrupção",
-      "Lava Jato",
-      "Educação fiscal\n\n",
-      "Programa Nacional de Educação Fiscal",
-      "Administração Tributária"
+      "Grupo de Atuação Especial de Combate às Organizações Criminosas",
+      "GAECO",
+      "Promotoria de Justiça da Comarca de Navegantes",
+      "Vara Regional de Garantias da Comarca de Itajaí",
+      "MPSC",
+      "A Polícia Científica de Santa Catarina",
+      "GAECO",
+      "Polícia Civil",
+      "Polícia Militar",
+      "Polícia Rodoviária Federal",
+      "Polícia Penal",
+      "Receita Estadual e Corpo de Bombeiros Militar"
     ],
     "fraud": [
       "corrupção"
@@ -56,38 +29,83 @@
     "prosecutor": null
   },
   {
-    "newspaper": "SCC SBT",
-    "title": "Roberto Azevedo\n            \n                Justiça Federal nega o pedido de suspensão da federalização do Porto de Itajaí",
-    "url": "https://scc10.com.br/colunistas/roberto-azevedo/justica-federal-nega-o-pedido-de-suspensao-da-federalizacao-do-porto-de-itajai/",
-    "date": "17/12/2024 12h48 • Atualizado há 50 segundos",
-    "cities": [],
-    "people": [
-      "Moser Vhoss",
-      "deputado",
-      "PL",
-      "Jorginho Mello",
-      "Silvio Costa Filho",
-      "ex-superintendente",
-      "Décio Lima",
-      "João Paulo Tavares",
-      "João Paulo",
-      "Instagram"
+    "newspaper": "Guararema News",
+    "title": "Segurança\n        \n        Mulher que abandonou gatos em Joinville vai responder por crime de maus-tratos\n        A Delegacia de Proteção Animal cumpriu mandado de busca e apreensão na residência da suspeita",
+    "url": "https://guararemanews.com.br/seguranca/crime-de-maus-tratos-a-animais/",
+    "date": null,
+    "cities": [
+      "Joinville"
     ],
+    "people": [],
     "organizations": [
-      "Convênio de Delegação",
-      "Porto de Itajaí",
-      "Foro Metropolitano da Foz do Rio Itajaí-Açú",
-      "Porto de Itajaí",
-      "Comissão de Viação e Transportes da Câmara",
-      "Sebrae",
-      "Porto de Itajaí",
-      "PT",
-      "Tribunal Regional Federal da 4ª Região",
-      "TRF-4",
-      "Threads"
+      "Polícia Civil",
+      "Guararema News",
+      "Polícia Civil",
+      "Delegacia de Proteção Animal de Joinville",
+      "Polícia Civil",
+      "Polícia Civil"
     ],
     "fraud": [
-      "justiça federal"
+      "mandado de busca"
+    ],
+    "value": null,
+    "prosecutor": null
+  },
+  {
+    "newspaper": "SC Todo Dia",
+    "title": "Gaeco investiga corrupção no Instituto Ambiental de Navegantes",
+    "url": "https://sctd.com.br/seguranca/gaeco-investiga-corrupcao-no-instituto-ambiental-de-navegantes/",
+    "date": "18/12/2024  11:22 - Atualizado em 18/12/2024  11:22",
+    "cities": [
+      "Navegantes"
+    ],
+    "people": [],
+    "organizations": [
+      "Grupo de Atuação Especial de Combate às Organizações Criminosas",
+      "Gaeco",
+      "Promotoria de Justiça de Navegantes",
+      "Gaeco",
+      "Instituto Ambiental de Navegantes",
+      "Vara Regional de Garantias da Comarca de Itajaí",
+      "Polícia Científica de Santa Catarina",
+      "Gaeco",
+      "Polícia Civil",
+      "Polícia Militar",
+      "Polícia Rodoviária Federal",
+      "Polícia Penal",
+      "Receita Estadual e Corpo de Bombeiros Militar"
+    ],
+    "fraud": [
+      "corrupção"
+    ],
+    "value": null,
+    "prosecutor": null
+  },
+  {
+    "newspaper": "Blog do Prisco",
+    "title": "Operação Tangente: grupo é investigado por corrupção em Navegantes",
+    "url": "https://www.blogdoprisco.com.br/operacao-tangente-grupo-e-investigado-por-corrupcao-em-navegantes/",
+    "date": "18 de dezembro de 2024",
+    "cities": [
+      "Navegantes"
+    ],
+    "people": [],
+    "organizations": [
+      "Grupo de Atuação Especial de Combate às Organizações Criminosas",
+      "GAECO",
+      "Promotoria de Justiça da Comarca de Navegantes",
+      "Vara Regional de Garantias da Comarca de Itajaí",
+      "Polícia Científica de Santa Catarina",
+      "GAECO",
+      "GAECO",
+      "Polícia Civil",
+      "Polícia Militar",
+      "Polícia Rodoviária Federal",
+      "Polícia Penal",
+      "Receita Estadual e Corpo de Bombeiros Militar"
+    ],
+    "fraud": [
+      "corrupção"
     ],
     "value": null,
     "prosecutor": null

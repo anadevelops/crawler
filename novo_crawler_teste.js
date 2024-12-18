@@ -1,12 +1,10 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
-import nlp from 'compromise';
 import { JSDOM } from 'jsdom';
 import { Readability } from '@mozilla/readability';
-import crypto from 'crypto';
 import axios from 'axios';
 
-const loadProcessedUrls = (filePath) => {
+const loadProcessedUrls = (filePath) => { // Carrega arquivo com as URLs das notícias que já foram coletadas
   if (fs.existsSync(filePath)) {
     const data = fs.readFileSync(filePath);
     return new Set(JSON.parse(data));
@@ -14,11 +12,19 @@ const loadProcessedUrls = (filePath) => {
   return new Set();
 };
 
-const saveProcessedUrls = (filePath, processedUrls) => {
+const saveProcessedUrls = (filePath, processedUrls) => { // Salva no arquivo as novas URLs coletadas
   fs.writeFileSync(filePath, JSON.stringify(Array.from(processedUrls), null, 2));
 };
 
-const runCrawler = (async () => {
+const runCrawler = (async () => { 
+
+  const sendLogToFlask = async (message) => {
+    try {
+      await axios.post('http://localhost:5000/log', {message});
+    } catch (err) {
+      console.error('Erro ao enviar log para o Flask: ', err);
+    }
+  };
 
   const browser = await chromium.launch();
   const mainPage = await browser.newPage();
@@ -72,11 +78,12 @@ const runCrawler = (async () => {
   for (const newspaper of newspapers) {
     const page = await browser.newPage();
     try {
+      await sendLogToFlask(`Checking newspaper: ${newspaper.name}`);
       console.log(`Checking newspaper: ${newspaper.name}`);
       await page.goto(newspaper.url, { waitUntil: 'domcontentloaded', timeout: 15000 });
       await page.waitForTimeout(5000);
       
-      const articles = await page.evaluate((keywords) => {
+      const articles = await page.evaluate((keywords) => { // Procura notícias com as palavras chave
         const links = Array.from(document.querySelectorAll('a'));
         return links.flatMap(link => {
           const foundKeywords = keywords.filter(keyword => link.textContent.toLowerCase().includes(keyword.toLowerCase()));
@@ -94,6 +101,7 @@ const runCrawler = (async () => {
             continue;
           }
 
+          await sendLogToFlask(`Fetching article: ${article.title}`);
           console.log(`Fetching article: ${article.title}`);
           await page.goto(article.url, { waitUntil: 'domcontentloaded', timeout: 15000 });
           await page.waitForTimeout(5000);
@@ -106,7 +114,7 @@ const runCrawler = (async () => {
             return document.querySelector('.date, .published-date, .published, .post-date, .data-post, .data, .td-post-date, .jeg_meta_date, .post__data__published, .meta-date, .datas_interno, .entry-date')?.innerText;
           });
 
-          const cleanHtml = await page.evaluate(() => {
+          const cleanHtml = await page.evaluate(() => { // Coleta o texto interno do site, para melhor coleta dos dados
             const scripts = document.querySelectorAll('script, style');
             scripts.forEach(script => script.remove());
             return document.documentElement.outerHTML;
@@ -115,8 +123,6 @@ const runCrawler = (async () => {
           const dom = new JSDOM(cleanHtml);
           const reader = new Readability(dom.window.document);
           const articleData = reader.parse()
-
-          const hash = crypto.createHash('sha256').update(articleData.textContent).digest('hex');
             
           processedUrls.add(article.url);
 
@@ -125,7 +131,7 @@ const runCrawler = (async () => {
             return regex.test(articleData) || regex.test(article.title);
           });
 
-          if (foundSCCities === 0) {
+          if (foundSCCities.length === 0) { // Testa se alguma cidade de SC é mencionada no corpo da notícia
             console.log('No SC city found.');
             continue;
           } else {
@@ -133,12 +139,12 @@ const runCrawler = (async () => {
           };
 
           const regx = /(?:R\$|\$)\s*\d{1,3}(?:\.\d{3})*(?:,\d{2})?(?:\s*(mil|milhões|bilhões|reais|dólares))?/gi;
-          const monetary_value = articleData.textContent.match(regx);
+          const monetary_value = articleData.textContent.match(regx); // Procura valores monetários
 
           const reg = /promotor\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
-          const prosecutor = articleData.textContent.match(reg);
+          const prosecutor = articleData.textContent.match(reg); // Procura a menção de algum promotor
 
-          const response = await fetch('http://localhost:5000/extract_entities', {
+          const response = await fetch('http://localhost:5000/extract_entities', { // Chama a API que contém o Spacy, para coleta de pessoas e empresas
             method: 'POST',
             headers: {
               'Content-type': 'application/json'
@@ -153,11 +159,11 @@ const runCrawler = (async () => {
           people = people.filter(person => !scCities.includes(person));
           organizations = organizations.filter(organization => !scCities.includes(organization));
 
-          results.push({
+          results.push({ //Sobe os resultados obtidos
             newspaper: newspaper.name,
             title: article.title,
             url: article.url,
-            // text: articleText,
+            text: articleText,
             date: articleDate || null, 
             cities: foundSCCities,
             people: people, 
@@ -170,18 +176,20 @@ const runCrawler = (async () => {
           processedUrls.add(article.url);
 
         } catch (err) {
+          await sendLogToFlask(`Failed to fetch article: ${article.title} - ${err}`);
           console.error(`Failed to fetch article: ${article.title} - ${err}`);
           break;
         }
       }
     } catch (err) {
+      await sendLogToFlask(`Failed to check newspaper: ${newspaper.name} - ${err}`);
       console.error(`Failed to check newspaper: ${newspaper.name} - ${err}`);
     } finally {
       await page.close();
     }
   }
 
-  const sendResultsToApp = async (results) => {
+  const sendResultsToApp = async (results) => { // Envia os resultados para a rota que os mostra na aplicação React
     try {
       await axios.post('http://localhost:5000/add_results', results);
       console.log('Resultados enviados para o Flask com sucesso.');
@@ -193,15 +201,15 @@ const runCrawler = (async () => {
   saveProcessedUrls(processedUrlsFilePath, processedUrls);
 
   const filePath = 'corruption_articles.json';
-  fs.writeFileSync(filePath, JSON.stringify(results, null, 2));
+  fs.writeFileSync(filePath, JSON.stringify(results, null, 2)); // Atualiza arquivo JSON
   await sendResultsToApp(results);
   console.log('JSON file updated');
-
 
   await mainPage.close();
   await browser.close();
 });
 
 runCrawler().catch(err => {
+  sendLogToFlask(`Error running the crawler: ${err}`);
   console.error(`Error running the crawler: ${err}`);
 });

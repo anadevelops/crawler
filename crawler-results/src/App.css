@@ -1,3 +1,8 @@
+body{
+  margin: 10px;
+  padding: 10px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -10,4 +15,9 @@ th, td {
 
 th {
   background-color: #f2f2f2;
+}
+
+.title{
+  justify-content: center;
+  text-align: center;
 }

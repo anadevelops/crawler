@@ -4,6 +4,7 @@ import spacy
 from spacy.training import Example
 from spacy.pipeline import EntityRecognizer
 import json
+import subprocess
 
 app = Flask(__name__)
 CORS(app)
@@ -60,7 +61,7 @@ def add_results():
     global results
     data = request.get_json()
     results.extend(data)
-    return jsonify({'message': 'Resultados adicionados com sucesso!'})
+    return jsonify({'message': 'Resultados adicionados com sucesso!'}), 200
 
 @app.route('/results', methods = ['GET'])
 def get_results():
@@ -70,6 +71,28 @@ def get_results():
             return jsonify(results)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         return jsonify({'error': f'Erro ao ler o arquivo: {e}'})
+    
+@app.route('/run_crawler', methods=['POST'])
+def run_crawler():
+    try:
+        subprocess.Popen(['node', './novo_crawler_teste.js'])
+        return jsonify({'message': 'Crawler iniciado com sucesso!'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+logs = []
+    
+@app.route('/log', methods=['POST'])
+def log_message():
+    data = request.get_json()
+    message = data.get('message', '')
+    logs.append(message)
+    print(message)
+    return jsonify({'status': 'success'}), 200
+
+@app.route('/logs', methods=['GET'])
+def get_logs():
+    return jsonify({'logs': logs}), 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
