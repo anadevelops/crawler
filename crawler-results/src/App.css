@@ -18,6 +18,24 @@ th {
 }
 
 .title{
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   text-align: center;
+  align-items: center;
+}
+
+.logs-container{
+  max-height: 30vh;
+  max-width: 100vh;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.logs-list{
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
 }

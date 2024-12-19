@@ -48,7 +48,7 @@ function App() {
 
   return (
     <Container >
-      <Row className='title justify-content-center'>
+      <Row>
         <InitCrawler onCrawlerStart={handleCrawlerStart}/>
       </Row>
       <Row>

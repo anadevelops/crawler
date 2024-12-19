@@ -1,6 +1,7 @@
 import React, {use, useEffect, useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
+import './App.css';
 
 function InitCrawler({onCrawlerStart}) {
     const [message, setMessage] = useState('');
@@ -49,7 +50,7 @@ function InitCrawler({onCrawlerStart}) {
     }, [showLogs]);
 
     return (
-      <div>
+      <div className='title'>
           <h1>Projeto Céos</h1>
           <h2>Crawler para coleta de notícias sobre corrupção no estado de SC</h2>
           <Button variant='secondary' size='lg' onClick={handleRunCrawler}> Iniciar Crawler</Button>
@@ -61,11 +62,13 @@ function InitCrawler({onCrawlerStart}) {
           {showLogs && (
             <div>
                 <h3>Logs do Crawler: </h3>
-                <ul>
-                    {logs.map((log, index) => (
-                        <li key={index}>{log}</li>
-                    ))}
-                </ul>
+                <div className='logs-container'>
+                    <ul className='logs-list'>
+                        {logs.map((log, index) => (
+                            <li key={index}>{log}</li>
+                        ))}
+                    </ul>
+                </div>
             </div>
           )}
       </div>

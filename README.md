@@ -6,6 +6,8 @@
         - `pip install -U pip setuptools wheel`
         - `pip install -U spacy`
         - `python -m spacy download pt_core_news_lg`
+        - `pip install flask`
+        - `pip install flask-cors`
     3. Inicie a API python: `python app.py`
 
 - Dentro da pasta 'crawler-results':
