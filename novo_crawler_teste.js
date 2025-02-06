@@ -4,6 +4,19 @@ import { JSDOM } from 'jsdom';
 import { Readability } from '@mozilla/readability';
 import axios from 'axios';
 
+async function updateJson(newResults) {
+  let existingData = [];
+
+  if (fs.existsSync(filePath)) {
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    existingData = JSON.parse(fileContent);
+  }
+
+  const updatedData = existingData.concat(newResults);
+
+  fs.writeFileSync(filePath, JSON.stringify(updatedData, null, 2));
+};
+
 const loadProcessedUrls = (filePath) => { // Carrega arquivo com as URLs das notícias que já foram coletadas
   if (fs.existsSync(filePath)) {
     const data = fs.readFileSync(filePath);
@@ -201,7 +214,8 @@ const runCrawler = (async () => {
   saveProcessedUrls(processedUrlsFilePath, processedUrls);
 
   const filePath = 'corruption_articles.json';
-  fs.writeFileSync(filePath, JSON.stringify(results, null, 2)); // Atualiza arquivo JSON
+  updateJson(results);
+  // fs.writeFileSync(filePath, JSON.stringify(results, null, 2)); // Atualiza arquivo JSON
   await sendResultsToApp(results);
   console.log('JSON file updated');
 
