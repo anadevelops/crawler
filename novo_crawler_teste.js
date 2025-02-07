@@ -6,6 +6,7 @@ import axios from 'axios';
 
 async function updateJson(newResults) {
   let existingData = [];
+  const filePath = 'corruption_articles.json';
 
   if (fs.existsSync(filePath)) {
     const fileContent = fs.readFileSync(filePath, 'utf-8');
@@ -213,7 +214,6 @@ const runCrawler = (async () => {
 
   saveProcessedUrls(processedUrlsFilePath, processedUrls);
 
-  const filePath = 'corruption_articles.json';
   updateJson(results);
   // fs.writeFileSync(filePath, JSON.stringify(results, null, 2)); // Atualiza arquivo JSON
   await sendResultsToApp(results);
