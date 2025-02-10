@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  flask-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: flask-app
+    ports:
+      - "5000:5000"
+    networks:
+      - my-network
+
+  node-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: node-app
+    depends_on:
+      - flask-app
+    environment:
+      - FLASK_URL=http://flask-app:5000
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge

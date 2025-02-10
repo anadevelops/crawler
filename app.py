@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import spacy
 from spacy.training import Example
@@ -44,6 +44,14 @@ train_model(nlp, TRAIN_DATA)
 nlp.to_disk("trained_model")
 
 results = []
+
+@app.route('/')
+def serve_frontend():
+    return send_from_directory('frontend/build', 'index.html')
+
+@app.route('/static/<path:path>')
+def serve_static(path):
+    return send_from_directory('frontend/build/static', path)
 
 @app.route("/extract_entities", methods=["POST"])
 def extract_entities():

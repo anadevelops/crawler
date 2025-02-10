@@ -26,19 +26,19 @@ const loadProcessedUrls = (filePath) => { // Carrega arquivo com as URLs das not
   return new Set();
 };
 
+const sendLogToFlask = async (message) => {
+  try {
+    await axios.post(`${process.env.FLASK_URL}/log`, {message});
+  } catch (err) {
+    console.error('Erro ao enviar log para o Flask: ', err);
+  }
+};
+
 const saveProcessedUrls = (filePath, processedUrls) => { // Salva no arquivo as novas URLs coletadas
   fs.writeFileSync(filePath, JSON.stringify(Array.from(processedUrls), null, 2));
 };
 
-const runCrawler = (async () => { 
-
-  const sendLogToFlask = async (message) => {
-    try {
-      await axios.post('http://localhost:5000/log', {message});
-    } catch (err) {
-      console.error('Erro ao enviar log para o Flask: ', err);
-    }
-  };
+const runCrawler = (async () => {
 
   const browser = await chromium.launch();
   const mainPage = await browser.newPage();
@@ -158,7 +158,7 @@ const runCrawler = (async () => {
           const reg = /promotor\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
           const prosecutor = articleData.textContent.match(reg); // Procura a menção de algum promotor
 
-          const response = await fetch('http://localhost:5000/extract_entities', { // Chama a API que contém o Spacy, para coleta de pessoas e empresas
+          const response = await fetch(`${process.env.FLASK_URL}/extract_entities`, { // Chama a API que contém o Spacy, para coleta de pessoas e empresas
             method: 'POST',
             headers: {
               'Content-type': 'application/json'
@@ -205,7 +205,7 @@ const runCrawler = (async () => {
 
   const sendResultsToApp = async (results) => { // Envia os resultados para a rota que os mostra na aplicação React
     try {
-      await axios.post('http://localhost:5000/add_results', results);
+      await axios.post(`${process.env.FLASK_URL}/add_results`, results);
       console.log('Resultados enviados para o Flask com sucesso.');
     } catch (err) {
       console.error('Erro ao enviar results: ', err);

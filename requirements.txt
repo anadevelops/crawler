@@ -1,0 +1,4 @@
+Flask==2.3.2
+Flask-CORS==4.0.0
+spacy==3.6.1
+numpy>=1.23.5
