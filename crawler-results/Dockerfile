@@ -5,10 +5,11 @@ FROM node:16 AS react-build
 WORKDIR /app/frontend
 
 # Copia os arquivos do front
-COPY frontend/package.json frontend/package-lock.json ./
+COPY package.json .
+COPY package-lock.json .
 RUN npm install
 
-COPY frontend/ ./
+COPY . ./
 
 # Constrói o front React
 RUN npm run build
