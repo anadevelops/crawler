@@ -29,7 +29,6 @@ const loadProcessedUrls = (filePath) => { // Carrega arquivo com as URLs das not
 };
 
 const sendLogToFlask = async (message) => {
-  console.log('caminho sendLogToFlask: ', process.env.FLASK_URL);
   try {
     await axios.post(`${process.env.FLASK_URL}/log`, {message});
   } catch (err) {
