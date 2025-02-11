@@ -3,6 +3,8 @@ import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import { Readability } from '@mozilla/readability';
 import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config();
 
 async function updateJson(newResults) {
   let existingData = [];
@@ -27,6 +29,7 @@ const loadProcessedUrls = (filePath) => { // Carrega arquivo com as URLs das not
 };
 
 const sendLogToFlask = async (message) => {
+  console.log('caminho sendLogToFlask: ', process.env.FLASK_URL);
   try {
     await axios.post(`${process.env.FLASK_URL}/log`, {message});
   } catch (err) {

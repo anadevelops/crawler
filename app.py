@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import spacy
 from spacy.training import Example
-from spacy.pipeline import EntityRecognizer
 import json
 import subprocess
 
@@ -12,11 +11,9 @@ CORS(app)
 nlp = spacy.load("pt_core_news_lg")
 
 if "ner" not in nlp.pipe_names:
-    ner = EntityRecognizer(nlp.vocab)
     nlp.add_pipe("ner", last=True)
-else:
-    ner = nlp.get_pipe("ner")
 
+ner = nlp.get_pipe("ner")
 ner.add_label("ORG")
 ner.add_label("PER")
 
