@@ -15,7 +15,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia o código do Flask para o container
 COPY app.py .
-COPY trained_model ./trained_model
 
 # Instala o modelo de linguagem do Spacy (português)
 RUN python -m spacy download pt_core_news_lg
